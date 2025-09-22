@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SarFaGo - Your Task Manager</title>
+    <link rel="stylesheet" href="backendlogin.js">
+    <link rel="stylesheet" href="loginfun.js">
+    <link rel="stylesheet" href="taskloading.js">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --light-lavender: #e6e6fa;
+            --lavender: #d8bfd8;
+            --purple: #800080;
+            --dark-purple: #4b0082;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --gray: #888;
+            --dark-gray: #555;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-lavender), var(--lavender));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--purple);
+            color: white;
+            padding: 15px 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .auth-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-btn.login {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .auth-btn.login:hover {
+            background: white;
+            color: var(--purple);
+        }
+
+        .auth-btn.signup {
+            background: white;
+            border: 2px solid white;
+            color: var(--purple);
+        }
+
+        .auth-btn.signup:hover {
+            background: transparent;
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Main Content Styles */
+        main {
+            flex: 1;
+            padding: 40px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(128, 0, 128, 0.2);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Page Styles */
+        .home-container {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .app-logo {
+            font-size: 48px;
+            color: var(--purple);
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .app-title {
+            font-size: 36px;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .app-tagline {
+            font-size: 18px;
+            color: var(--dark-gray);
+            margin-bottom: 30px;
+        }
+
+        .app-features {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .feature {
+            width: 30%;
+            min-width: 250px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: var(--light-lavender);
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(128, 0, 128, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            color: var(--purple);
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            color: var(--dark-purple);
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--dark-gray);
+        }
+
+        .home-auth-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .home-auth-btn {
+            padding: 12px 30px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .home-auth-btn:hover {
+            background: var(--dark-purple);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(128, 0, 128, 0.2);
+        }
+
+        .home-auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .home-auth-btn.secondary {
+            background: transparent;
+            color: var(--purple);
+            border: 2px solid var(--purple);
+        }
+
+        .home-auth-btn.secondary:hover {
+            background: rgba(128, 0, 128, 0.1);
+        }
+
+        /* Form Styles */
+        .form-container {
+            padding: 30px;
+            transition: transform 0.5s ease;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-purple);
+            font-weight: 600;
+        }
+
+        .form-control input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--lavender);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control input:focus {
+            border-color: var(--purple);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(128, 0, 128, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--dark-purple);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--dark-gray);
+        }
+
+        .toggle-text a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        .app-header {
+            background: var(--purple);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .todo-container {
+            padding: 20px;
+        }
+
+        #todo-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #todo-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--lavender);
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+        }
+
+        #add-btn {
+            padding: 12px 20px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #add-btn:hover {
+            background: var(--dark-purple);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: var(--light-lavender);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: var(--purple);
+            color: white;
+        }
+
+        #todo-list {
+            list-style-type: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--light-lavender);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+            transition: transform 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-item.completed {
+            background: var(--light-gray);
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--gray);
+        }
+
+        .todo-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+            color: var(--dark-gray);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--purple);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #ff0000;
+            transform: scale(1.2);
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--purple);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--dark-purple);
+            color: white;
+            padding: 40px 5% 20px;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--lavender);
+        }
+
+        .contact-info {
+            list-style: none;
+        }
+
+        .contact-info li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-info i {
+            font-size: 18px;
+            color: var(--lavender);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--purple);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .auth-buttons {
+                margin-top: 15px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 20px;
+            }
+            
+            .mobile-nav {
+                display: none;
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .mobile-nav.active {
+                display: block;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .home-container {
+                padding: 30px 20px;
+            }
+            
+            .app-title {
+                font-size: 28px;
+            }
+            
+            .app-tagline {
+                font-size: 16px;
+            }
+            
+            .feature {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .home-auth-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .app-header h1 {
+                font-size: 20px;
+            }
+            
+            .todo-container {
+                padding: 15px;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-tasks"></i>
+                <span>SarFaGo</span>
+            </div>
+            
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                <button class="auth-btn login" id="header-login-btn">Login</button>
+                <button class="auth-btn signup" id="header-signup-btn">Sign Up</button>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-nav" id="mobile-nav">
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="auth-btn login" id="mobile-login-btn">Login</button>
+                <button class="auth-btn signup" id="mobile-signup-btn">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Home Page -->
+            <div class="home-container" id="home-page">
+                <div class="app-logo">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h1 class="app-title">SarFaGo</h1>
+                <p class="app-tagline">Your personal task management solution</p>
+                
+                <div class="app-features">
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="feature-title">Organize Tasks</h3>
+                        <p class="feature-desc">Easily create and manage your to-do list with our intuitive interface.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3 class="feature-title">Stay On Track</h3>
+                        <p class="feature-desc">Never miss a deadline with our reminder system and progress tracking.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Anywhere Access</h3>
+                        <p class="feature-desc">Access your tasks from any device with our responsive design.</p>
+                    </div>
+                </div>
+                
+                <div class="home-auth-buttons">
+                    <button class="home-auth-btn" id="home-login-btn">Login</button>
+                    <button class="home-auth-btn secondary" id="home-signup-btn">Sign Up</button>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-container hidden" id="login-container">
+                <div class="app-header">
+                    <button class="back-btn" id="login-back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1><i class="fas fa-sign-in-alt"></i> Login to SarFaGo</h1>
+                </div>
+                <div class="form-control">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <div class="form-control">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button class="btn" id="login-btn">
+                    <span id="login-text">Login</span>
+                    <span id="login-loading" class="hidden loading"></span>
+                </button>
+                <div class="toggle-text">
+                    Don't have an account? <a id="show-signup">Sign Up</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form-container hidden" id="signup-container">
+                <div class="app-header">
+                    <button class="back-btn" id="signup-back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1><i class="fas fa-user-plus"></i> Create an Account</h1>
+                </div>
+                <div class="form-control">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-control">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email">
+                </div>
+                <div class="form-control">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password">
+                </div>
+                <div class="form-control">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Confirm your password">
+                </div>
+                <button class="btn" id="signup-btn">
+                    <span id="signup-text">Sign Up</span>
+                    <span id="signup-loading" class="hidden loading"></span>
+                </button>
+                <div class="toggle-text">
+                    Already have an account? <a id="show-login">Login</a>
+                </div>
+            </div>
+
+            <!-- Todo App (shown after login) -->
+            <div class="hidden" id="todo-app">
+                <div class="app-header">
+                    <button class="logout-btn" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                    <h1><i class="fas fa-tasks"></i> SarFaGo</h1>
+                </div>
+                <div class="todo-container">
+                    <form id="todo-form">
+                        <input type="text" id="todo-input" placeholder="Add a new task...">
+                        <button type="submit" id="add-btn">Add</button>
+                    </form>
+                    
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+                    
+                    <ul id="todo-list"></ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul class="contact-info">
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>info@sarfago.com</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <span>+1 (555) 123-4567</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Tech Street, Digital City</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <p>Stay connected with us on social media for updates and tips.</p>
+                <div class="social-links">
+                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="contact-info">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 SarFaGo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const homePage = document.getElementById('home-page');
+        const loginContainer = document.getElementById('login-container');
+        const signupContainer = document.getElementById('signup-container');
+        const todoApp = document.getElementById('todo-app');
+        const homeLoginBtn = document.getElementById('home-login-btn');
+        const homeSignupBtn = document.getElementById('home-signup-btn');
+        const headerLoginBtn = document.getElementById('header-login-btn');
+        const headerSignupBtn = document.getElementById('header-signup-btn');
+        const mobileLoginBtn = document.getElementById('mobile-login-btn');
+        const mobileSignupBtn = document.getElementById('mobile-signup-btn');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const loginBackBtn = document.getElementById('login-back-btn');
+        const signupBackBtn = document.getElementById('signup-back-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoList = document.getElementById('todo-list');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const loginText = document.getElementById('login-text');
+        const loginLoading = document.getElementById('login-loading');
+        const signupText = document.getElementById('signup-text');
+        const signupLoading = document.getElementById('signup-loading');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        // Current filter
+        let currentFilter = 'all';
+        let currentUser = null;
+        let authToken = null;
+
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileNav.classList.toggle('active');
+        });
+
+        // Navigation functions
+        homeLoginBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        });
+
+        homeSignupBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            signupContainer.classList.remove('hidden');
+        });
+
+        headerLoginBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        });
+
+        headerSignupBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            signupContainer.classList.remove('hidden');
+        });
+
+        mobileLoginBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+            mobileNav.classList.remove('active');
+        });
+
+        mobileSignupBtn.addEventListener('click', () => {
+            homePage.classList.add('hidden');
+            signupContainer.classList.remove('hidden');
+            mobileNav.classList.remove('active');
+        });
+
+        loginBackBtn.addEventListener('click', () => {
+            loginContainer.classList.add('hidden');
+            homePage.classList.remove('hidden');
+        });
+
+        signupBackBtn.addEventListener('click', () => {
+            signupContainer.classList.add('hidden');
+            homePage.classList.remove('hidden');
+        });
+
+        // Show signup form from login
+        showSignupBtn.addEventListener('click', () => {
+            loginContainer.classList.add('hidden');
+            signupContainer.classList.remove('hidden');
+        });
+
+        // Show login form from signup
+        showLoginBtn.addEventListener('click', () => {
+            signupContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        });
+
+        // Show notification
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Simulate API call delay
+        function simulateAPICall() {
+            return new Promise(resolve => setTimeout(resolve, 1500));
+        }
+
+        // Login function
+        loginBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showNotification('Please enter both email and password', true);
+                return;
+            }
+            
+            // Show loading state
+            loginText.classList.add('hidden');
+            loginLoading.classList.remove('hidden');
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Check if user exists in localStorage (simulating MongoDB)
+                const users = JSON.parse(localStorage.getItem('sarFagoUsers')) || [];
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    // Generate auth token (simulated)
+                    authToken = `token-${Math.random().toString(36).substr(2)}`;
+                    currentUser = user;
+                    
+                    // Store session (simulated)
+                    localStorage.setItem('sarFagoAuthToken', authToken);
+                    localStorage.setItem('sarFagoCurrentUser', JSON.stringify(user));
+                    
+                    // Show success notification
+                    showNotification('Login successful!');
+                    
+                    // Switch to todo app
+                    loginContainer.classList.add('hidden');
+                    signupContainer.classList.add('hidden');
+                    todoApp.classList.remove('hidden');
+                    
+                    // Load user's tasks
+                    loadTasks();
+                } else {
+                    showNotification('Invalid email or password', true);
+                }
+            } catch (error) {
+                showNotification('Login failed. Please try again.', true);
+            } finally {
+                // Hide loading state
+                loginText.classList.remove('hidden');
+                loginLoading.classList.add('hidden');
+            }
+        });
+
+        // Signup function
+        signupBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (!name || !email || !password || !confirm) {
+                showNotification('Please fill all fields', true);
+                return;
+            }
+            
+            if (password !== confirm) {
+                showNotification('Passwords do not match', true);
+                return;
+            }
+            
+            // Show loading state
+            signupText.classList.add('hidden');
+            signupLoading.classList.remove('hidden');
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Check if user already exists
+                const users = JSON.parse(localStorage.getItem('sarFagoUsers')) || [];
+                if (users.some(u => u.email === email)) {
+                    showNotification('User with this email already exists', true);
+                    return;
+                }
+                
+                // Create new user
+                const newUser = {
+                    id: `user-${Math.random().toString(36).substr(2)}`,
+                    name,
+                    email,
+                    password,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save user to localStorage (simulating MongoDB)
+                users.push(newUser);
+                localStorage.setItem('sarFagoUsers', JSON.stringify(users));
+                
+                // Generate auth token (simulated)
+                authToken = `token-${Math.random().toString(36).substr(2)}`;
+                currentUser = newUser;
+                
+                // Store session (simulated)
+                localStorage.setItem('sarFagoAuthToken', authToken);
+                localStorage.setItem('sarFagoCurrentUser', JSON.stringify(newUser));
+                
+                // Show success notification
+                showNotification('Account created successfully!');
+                
+                // Switch to todo app
+                signupContainer.classList.add('hidden');
+                todoApp.classList.remove('hidden');
+                
+                // Load empty task list for new user
+                loadTasks();
+            } catch (error) {
+                showNotification('Signup failed. Please try again.', true);
+            } finally {
+                // Hide loading state
+                signupText.classList.remove('hidden');
+                signupLoading.classList.add('hidden');
+            }
+        });
+
+        // Logout function
+        logoutBtn.addEventListener('click', () => {
+            // Clear auth data
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('sarFagoAuthToken');
+            localStorage.removeItem('sarFagoCurrentUser');
+            
+            // Show notification
+            showNotification('Logged out successfully');
+            
+            // Switch to home page
+            todoApp.classList.add('hidden');
+            homePage.classList.remove('hidden');
+            
+            // Clear input fields
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        });
+
+        // Add new task
+        todoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const taskText = todoInput.value.trim();
+            if (!taskText) {
+                showNotification('Please enter a task', true);
+                return;
+            }
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Create new task
+                const newTask = {
+                    id: `task-${Math.random().toString(36).substr(2)}`,
+                    text: taskText,
+                    completed: false,
+                    userId: currentUser.id,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save task to localStorage (simulating MongoDB)
+                const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                tasks.push(newTask);
+                localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                
+                // Add task to UI
+                addTaskToUI(newTask);
+                
+                // Clear input
+                todoInput.value = '';
+                
+                // Show notification
+                showNotification('Task added successfully!');
+            } catch (error) {
+                showNotification('Failed to add task. Please try again.', true);
+            }
+        });
+
+        // Add task to UI
+        function addTaskToUI(task) {
+            const li = document.createElement('li');
+            li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+            li.dataset.id = task.id;
+            li.innerHTML = `
+                <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
+                <span class="todo-text">${task.text}</span>
+                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+            `;
+            
+            // Add event listeners
+            const checkbox = li.querySelector('.todo-checkbox');
+            const deleteBtn = li.querySelector('.delete-btn');
+            
+            checkbox.addEventListener('change', () => toggleTaskComplete(task.id));
+            deleteBtn.addEventListener('click', () => deleteTask(task.id));
+            
+            todoList.appendChild(li);
+        }
+
+        // Toggle task completion
+        async function toggleTaskComplete(taskId) {
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Update task in localStorage (simulating MongoDB)
+                const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                const taskIndex = tasks.findIndex(t => t.id === taskId);
+                
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                    localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                    
+                    // Update UI
+                    const taskElement = document.querySelector(`.todo-item[data-id="${taskId}"]`);
+                    if (taskElement) {
+                        taskElement.classList.toggle('completed');
+                    }
+                }
+            } catch (error) {
+                showNotification('Failed to update task. Please try again.', true);
+            }
+        }
+
+        // Delete task
+        async function deleteTask(taskId) {
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Remove task from localStorage (simulating MongoDB)
+                let tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                tasks = tasks.filter(t => t.id !== taskId);
+                localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                
+                // Remove from UI
+                const taskElement = document.querySelector(`.todo-item[data-id="${taskId}"]`);
+                if (taskElement) {
+                    taskElement.classList.add('hidden');
+                    setTimeout(() => {
+                        taskElement.remove();
+                        showNotification('Task deleted successfully!');
+                    }, 300);
+                }
+            } catch (error) {
+                showNotification('Failed to delete task. Please try again.', true);
+            }
+        }
+
+        // Load tasks for current user
+        function loadTasks() {
+            // Clear current tasks
+            todoList.innerHTML = '';
+            
+            // Get tasks from localStorage (simulating MongoDB)
+            const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+            const userTasks = tasks.filter(t => t.userId === currentUser.id);
+            
+            // Add tasks to UI
+            userTasks.forEach(task => addTaskToUI(task));
+            
+            // Apply current filter
+            filterTasks();
+        }
+
+        // Filter tasks
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                filterTasks();
+            });
+        });
+
+        // Filter tasks based on selected filter
+        function filterTasks() {
+            const items = todoList.querySelectorAll('.todo-item');
+            
+            items.forEach(item => {
+                switch(currentFilter) {
+                    case 'all':
+                        item.style.display = 'flex';
+                        break;
+                    case 'active':
+                        item.style.display = item.classList.contains('completed') ? 'none' : 'flex';
+                        break;
+                    case 'completed':
+                        item.style.display = item.classList.contains('completed') ? 'flex' : 'none';
+                        break;
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        function checkAuthStatus() {
+            const token = localStorage.getItem('sarFagoAuthToken');
+            const user = JSON.parse(localStorage.getItem('sarFagoCurrentUser'));
+            
+            if (token && user) {
+                authToken = token;
+                currentUser = user;
+                homePage.classList.add('hidden');
+                loginContainer.classList.add('hidden');
+                signupContainer.classList.add('hidden');
+                todoApp.classList.remove('hidden');
+                loadTasks();
+            }
+        }
+
+        // Initialize the application
+        function init() {
+            checkAuthStatus();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
