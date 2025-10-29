@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SarFaGo - Task Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --light-lavender: #e6e6fa;
+            --lavender: #d8bfd8;
+            --purple: #800080;
+            --dark-purple: #4b0082;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --gray: #0f0f0f;
+            --dark-gray: #0f0f0f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-lavender), var(--lavender));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(128, 0, 128, 0.2);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-container {
+            padding: 30px;
+            transition: transform 0.5s ease;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-purple);
+            font-weight: 600;
+        }
+
+        .form-control input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--lavender);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control input:focus {
+            border-color: var(--purple);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(128, 0, 128, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--dark-purple);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--dark-gray);
+        }
+
+        .toggle-text a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        .app-header {
+            background: var(--purple);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .todo-container {
+            padding: 20px;
+        }
+
+        #todo-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #todo-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--lavender);
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+        }
+
+        #add-btn {
+            padding: 12px 20px;
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #add-btn:hover {
+            background: var(--dark-purple);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background: var(--light-lavender);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background: var(--purple);
+            color: white;
+        }
+
+        #todo-list {
+            list-style-type: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--light-lavender);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+            transition: transform 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-item.completed {
+            background: var(--light-gray);
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--gray);
+        }
+
+        .todo-checkbox {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+            color: var(--black);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--purple);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #ff0000;
+            transform: scale(1.2);
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--purple);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .app-header h1 {
+                font-size: 20px;
+            }
+            
+            .todo-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container" id="login-container">
+            <h2 style="text-align: center; color: var(--purple); margin-bottom: 20px;">Login to SarFaGo</h2>
+            <div class="form-control">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="form-control">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button class="btn" id="login-btn">
+                <span id="login-text">Login</span>
+                <span id="login-loading" class="hidden loading"></span>
+            </button>
+            <div class="toggle-text">
+                Don't have an account? <a id="show-signup">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="form-container hidden" id="signup-container">
+            <h2 style="text-align: center; color: var(--purple); margin-bottom: 20px;">Create an Account</h2>
+            <div class="form-control">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" placeholder="Enter your full name">
+            </div>
+            <div class="form-control">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" placeholder="Enter your email">
+            </div>
+            <div class="form-control">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password">
+            </div>
+            <div class="form-control">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" placeholder="Confirm your password">
+            </div>
+            <button class="btn" id="signup-btn">
+                <span id="signup-text">Sign Up</span>
+                <span id="signup-loading" class="hidden loading"></span>
+            </button>
+            <div class="toggle-text">
+                Already have an account? <a id="show-login">Login</a>
+            </div>
+        </div>
+
+        <!-- Todo App (shown after login) -->
+        <div class="hidden" id="todo-app">
+            <div class="app-header">
+                <h1><i class="fas fa-tasks"></i> SarFaGo</h1>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            <div class="todo-container">
+                <form id="todo-form">
+                    <input type="text" id="todo-input" placeholder="Add a new task...">
+                    <button type="submit" id="add-btn">Add</button>
+                </form>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+                
+                <ul id="todo-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const signupContainer = document.getElementById('signup-container');
+        const todoApp = document.getElementById('todo-app');
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoList = document.getElementById('todo-list');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const loginText = document.getElementById('login-text');
+        const loginLoading = document.getElementById('login-loading');
+        const signupText = document.getElementById('signup-text');
+        const signupLoading = document.getElementById('signup-loading');
+
+        // Current filter
+        let currentFilter = 'all';
+        let currentUser = null;
+        let authToken = null;
+
+        // Show signup form
+        showSignupBtn.addEventListener('click', () => {
+            loginContainer.classList.add('hidden');
+            signupContainer.classList.remove('hidden');
+        });
+
+        // Show login form
+        showLoginBtn.addEventListener('click', () => {
+            signupContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        });
+
+        // Show notification
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Simulate API call delay
+        function simulateAPICall() {
+            return new Promise(resolve => setTimeout(resolve, 1500));
+        }
+
+        // Login function
+        loginBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showNotification('Please enter both email and password', true);
+                return;
+            }
+            
+            // Show loading state
+            loginText.classList.add('hidden');
+            loginLoading.classList.remove('hidden');
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Check if user exists in localStorage (simulating MongoDB)
+                const users = JSON.parse(localStorage.getItem('sarFagoUsers')) || [];
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    // Generate auth token (simulated)
+                    authToken = `token-${Math.random().toString(36).substr(2)}`;
+                    currentUser = user;
+                    
+                    // Store session (simulated)
+                    localStorage.setItem('sarFagoAuthToken', authToken);
+                    localStorage.setItem('sarFagoCurrentUser', JSON.stringify(user));
+                    
+                    // Show success notification
+                    showNotification('Login successful!');
+                    
+                    // Switch to todo app
+                    loginContainer.classList.add('hidden');
+                    signupContainer.classList.add('hidden');
+                    todoApp.classList.remove('hidden');
+                    
+                    // Load user's tasks
+                    loadTasks();
+                } else {
+                    showNotification('Invalid email or password', true);
+                }
+            } catch (error) {
+                showNotification('Login failed. Please try again.', true);
+            } finally {
+                // Hide loading state
+                loginText.classList.remove('hidden');
+                loginLoading.classList.add('hidden');
+            }
+        });
+
+        // Signup function
+        signupBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (!name || !email || !password || !confirm) {
+                showNotification('Please fill all fields', true);
+                return;
+            }
+            
+            if (password !== confirm) {
+                showNotification('Passwords do not match', true);
+                return;
+            }
+            
+            // Show loading state
+            signupText.classList.add('hidden');
+            signupLoading.classList.remove('hidden');
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Check if user already exists
+                const users = JSON.parse(localStorage.getItem('sarFagoUsers')) || [];
+                if (users.some(u => u.email === email)) {
+                    showNotification('User with this email already exists', true);
+                    return;
+                }
+                
+                // Create new user
+                const newUser = {
+                    id: `user-${Math.random().toString(36).substr(2)}`,
+                    name,
+                    email,
+                    password,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save user to localStorage (simulating MongoDB)
+                users.push(newUser);
+                localStorage.setItem('sarFagoUsers', JSON.stringify(users));
+                
+                // Generate auth token (simulated)
+                authToken = `token-${Math.random().toString(36).substr(2)}`;
+                currentUser = newUser;
+                
+                // Store session (simulated)
+                localStorage.setItem('sarFagoAuthToken', authToken);
+                localStorage.setItem('sarFagoCurrentUser', JSON.stringify(newUser));
+                
+                // Show success notification
+                showNotification('Account created successfully!');
+                
+                // Switch to todo app
+                signupContainer.classList.add('hidden');
+                todoApp.classList.remove('hidden');
+                
+                // Load empty task list for new user
+                loadTasks();
+            } catch (error) {
+                showNotification('Signup failed. Please try again.', true);
+            } finally {
+                // Hide loading state
+                signupText.classList.remove('hidden');
+                signupLoading.classList.add('hidden');
+            }
+        });
+
+        // Logout function
+        logoutBtn.addEventListener('click', () => {
+            // Clear auth data
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('sarFagoAuthToken');
+            localStorage.removeItem('sarFagoCurrentUser');
+            
+            // Show notification
+            showNotification('Logged out successfully');
+            
+            // Switch to login screen
+            todoApp.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+            
+            // Clear input fields
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        });
+
+        // Add new task
+        todoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const taskText = todoInput.value.trim();
+            if (!taskText) {
+                showNotification('Please enter a task', true);
+                return;
+            }
+            
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Create new task
+                const newTask = {
+                    id: `task-${Math.random().toString(36).substr(2)}`,
+                    text: taskText,
+                    completed: false,
+                    userId: currentUser.id,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save task to localStorage (simulating MongoDB)
+                const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                tasks.push(newTask);
+                localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                
+                // Add task to UI
+                addTaskToUI(newTask);
+                
+                // Clear input
+                todoInput.value = '';
+                
+                // Show notification
+                showNotification('Task added successfully!');
+            } catch (error) {
+                showNotification('Failed to add task. Please try again.', true);
+            }
+        });
+
+        // Add task to UI
+        function addTaskToUI(task) {
+            const li = document.createElement('li');
+            li.className = `todo-item ${task.completed ? 'completed' : ''}`;
+            li.dataset.id = task.id;
+            li.innerHTML = `
+                <input type="checkbox" class="todo-checkbox" ${task.completed ? 'checked' : ''}>
+                <span class="todo-text">${task.text}</span>
+                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+            `;
+            
+            // Add event listeners
+            const checkbox = li.querySelector('.todo-checkbox');
+            const deleteBtn = li.querySelector('.delete-btn');
+            
+            checkbox.addEventListener('change', () => toggleTaskComplete(task.id));
+            deleteBtn.addEventListener('click', () => deleteTask(task.id));
+            
+            todoList.appendChild(li);
+        }
+
+        // Toggle task completion
+        async function toggleTaskComplete(taskId) {
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Update task in localStorage (simulating MongoDB)
+                const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                const taskIndex = tasks.findIndex(t => t.id === taskId);
+                
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                    localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                    
+                    // Update UI
+                    const taskElement = document.querySelector(`.todo-item[data-id="${taskId}"]`);
+                    if (taskElement) {
+                        taskElement.classList.toggle('completed');
+                    }
+                }
+            } catch (error) {
+                showNotification('Failed to update task. Please try again.', true);
+            }
+        }
+
+        // Delete task
+        async function deleteTask(taskId) {
+            try {
+                // Simulate API call to MongoDB
+                await simulateAPICall();
+                
+                // Remove task from localStorage (simulating MongoDB)
+                let tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+                tasks = tasks.filter(t => t.id !== taskId);
+                localStorage.setItem('sarFagoTasks', JSON.stringify(tasks));
+                
+                // Remove from UI
+                const taskElement = document.querySelector(`.todo-item[data-id="${taskId}"]`);
+                if (taskElement) {
+                    taskElement.classList.add('hidden');
+                    setTimeout(() => {
+                        taskElement.remove();
+                        showNotification('Task deleted successfully!');
+                    }, 300);
+                }
+            } catch (error) {
+                showNotification('Failed to delete task. Please try again.', true);
+            }
+        }
+
+        // Load tasks for current user
+        function loadTasks() {
+            // Clear current tasks
+            todoList.innerHTML = '';
+            
+            // Get tasks from localStorage (simulating MongoDB)
+            const tasks = JSON.parse(localStorage.getItem('sarFagoTasks')) || [];
+            const userTasks = tasks.filter(t => t.userId === currentUser.id);
+            
+            // Add tasks to UI
+            userTasks.forEach(task => addTaskToUI(task));
+            
+            // Apply current filter
+            filterTasks();
+        }
+
+        // Filter tasks
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                filterTasks();
+            });
+        });
+
+        // Filter tasks based on selected filter
+        function filterTasks() {
+            const items = todoList.querySelectorAll('.todo-item');
+            
+            items.forEach(item => {
+                switch(currentFilter) {
+                    case 'all':
+                        item.style.display = 'flex';
+                        break;
+                    case 'active':
+                        item.style.display = item.classList.contains('completed') ? 'none' : 'flex';
+                        break;
+                    case 'completed':
+                        item.style.display = item.classList.contains('completed') ? 'flex' : 'none';
+                        break;
+                }
+            });
+        }
+
+        // Check if user is already logged in
+        function checkAuthStatus() {
+            const token = localStorage.getItem('sarFagoAuthToken');
+            const user = JSON.parse(localStorage.getItem('sarFagoCurrentUser'));
+            
+            if (token && user) {
+                authToken = token;
+                currentUser = user;
+                loginContainer.classList.add('hidden');
+                signupContainer.classList.add('hidden');
+                todoApp.classList.remove('hidden');
+                loadTasks();
+            }
+        }
+
+        // Initialize the application
+        function init() {
+            checkAuthStatus();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>
